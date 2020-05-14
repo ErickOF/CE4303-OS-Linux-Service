@@ -1,10 +1,4 @@
 // Server side C program to demonstrate HTTP Server programming
-/*
-Code from:
-
-https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa
-
-*/
 #include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -58,7 +52,21 @@ int main(int argc, char const *argv[])
         
         char buffer[30000] = {0};
         valread = read( new_socket , buffer, 30000);
-        printf("%s\n",buffer );
+        
+        if (strstr(buffer,"POST") != NULL){
+            char * data = strstr(strstr(buffer,"Content-Length"),"\r\n\r\n");
+            data += 4;            
+            FILE * fp;    
+            fp = fopen("./Received_Data.txt","w");    
+            fprintf(fp,"%s", data);        
+            //fputs(data,fp);
+            fclose(fp);    
+        }
+        
+        printf("%s",buffer );
+        
+        
+        
         write(new_socket , hello , strlen(hello));
         printf("------------------Hello message sent-------------------");
         close(new_socket);
