@@ -6,6 +6,16 @@
 #include <netinet/in.h>
 #include <string.h>
 
+
+/*
+Paginas usadas:
+
+https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa
+
+https://stackoverflow.com/questions/30440188/sending-files-from-client-to-server-using-sockets-in-c 
+ */
+
+
 #define PORT 8080
 int main(int argc, char const *argv[])
 {
@@ -50,21 +60,32 @@ int main(int argc, char const *argv[])
             exit(EXIT_FAILURE);
         }
         
-        char buffer[30000] = {0};
-        valread = read( new_socket , buffer, 30000);
+        char buffer[30001];
+        memset(buffer, '0', sizeof(buffer));
+        int  b,tot;
+        
+        b = recv(new_socket, buffer, 30000,0) ;
+        
         
         if (strstr(buffer,"POST") != NULL){
-            char * data = strstr(strstr(buffer,"Content-Length"),"\r\n\r\n");
-            data += 4;            
-            FILE * fp;    
-            fp = fopen("./Received_Data.txt","w");    
-            fprintf(fp,"%s", data);        
-            //fputs(data,fp);
-            fclose(fp);    
+            char * dataStart = strstr(buffer,"\r\n\r\n");
+            dataStart += 4;                        
+            FILE* fp = fopen( "received_image.png", "wb");
+        
+            
+            if(fp != NULL){                
+                
+                fwrite(dataStart, 1, b, fp);
+                
+                printf("Received bytes: %d\n",b);
+                
+                fclose(fp);                                
+            }else{
+                perror("File\n");
+            }            
+        }else if (strstr(buffer,"GET") != NULL){
+            1;
         }
-        
-        printf("%s",buffer );
-        
         
         
         write(new_socket , hello , strlen(hello));
