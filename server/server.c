@@ -16,7 +16,7 @@ https://stackoverflow.com/questions/30440188/sending-files-from-client-to-server
  */
 
 
-#define PORT 8080
+#define PORT 8081
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket; long valread;
@@ -71,13 +71,14 @@ int main(int argc, char const *argv[])
             char * dataStart = strstr(buffer,"\r\n\r\n");
             dataStart += 4;                        
             FILE* fp = fopen( "received_image.png", "wb");
-        
+            
+            int start  = dataStart - buffer;
             
             if(fp != NULL){                
                 
-                fwrite(dataStart, 1, b, fp);
+                fwrite(dataStart, 1, b-start, fp);
                 
-                printf("Received bytes: %d\n",b);
+                printf("Received bytes: %d, header size %d\n",b, start);
                 
                 fclose(fp);                                
             }else{
@@ -87,6 +88,7 @@ int main(int argc, char const *argv[])
             1;
         }
         
+        printf("buffer:\n%s",buffer);
         
         write(new_socket , hello , strlen(hello));
         printf("------------------Hello message sent-------------------");
