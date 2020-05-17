@@ -6,7 +6,8 @@
 #include <netinet/in.h>
 #include <string.h>
 
-
+// For timed names
+#include <time.h>
 /*
 Paginas usadas:
 
@@ -36,7 +37,14 @@ int main(int argc, char const *argv[])
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( PORT );
+    
+    // Temporal until config file is used
+    
+    int inpPort;
+    printf("Enter port: ");
+    scanf("%d", &inpPort);
+    address.sin_port = htons( inpPort );
+    //address.sin_port = htons( PORT );
     
     memset(address.sin_zero, '\0', sizeof address.sin_zero);
     
@@ -60,35 +68,104 @@ int main(int argc, char const *argv[])
             exit(EXIT_FAILURE);
         }
         
-        char buffer[30001];
+        char buffer[1025];
         memset(buffer, '0', sizeof(buffer));
-        int  b,tot;
+        size_t  b,tot;
         
-        b = recv(new_socket, buffer, 30000,0) ;
+        b = recv(new_socket, buffer, 1024,0) ;
         
+        char * dataStart = strstr(buffer,"\r\n\r\n");
+        dataStart += 4;  
         
-        if (strstr(buffer,"POST") != NULL){
-            char * dataStart = strstr(buffer,"\r\n\r\n");
-            dataStart += 4;                        
-            FILE* fp = fopen( "received_image.png", "wb");
+        size_t headerSize  = dataStart - buffer;
+        
+        fwrite(buffer, 1, headerSize, stdout); // Prints the header of POST-GET
+        
+        char * contentSizeP = strstr(buffer,"Content-Length:");
+        if ((strstr(buffer,"POST") != NULL) && (contentSizeP != NULL)){
+                                    
+            contentSizeP += 15; //Size of "Content-Length:"
+            size_t contentSize =  strtol(contentSizeP, NULL, 10); //Converts to size_t the size
+                                                          
+            char dir [] = "./files/"; // Dir to save                            
+            char fname[50] = ""; // Filename
             
-            int start  = dataStart - buffer;
+            // If the header contains the name for the new file using the format:
+            // Filename: example.png
+            char * filenameP = strstr(buffer,"Filename");
+            if (filenameP != NULL){
+                char * filenamePE = strstr(filenameP,"\n"); // Points to the end of this line
+                filenameP += 10; //Size of "Filename:"
+                int fNameLen = filenamePE - filenameP;
+                if (fNameLen > 1){
+                    memcpy(fname,filenameP,fNameLen);      // Copies name to fname 
+                }else{
+                    filenameP = NULL; //If the given name is too small it uses the time format name below
+                }
+            } 
+            /* If the header doesn't contain the name of the file, the name will be taken 
+             * from the current time Y-m-d-H-M-S
+             * if the Content-Type header is included, appends the corresponding extension .jpg or .png
+             * Content-Type: *png*   OR   Content-Type: *jpeg*
+             */
+            if(filenameP == NULL) {                
+                time_t rawtime;
+                time(&rawtime);
+                strftime(fname,49,"%Y-%m-%d-%H-%M-%S", localtime(&rawtime)); //Formats time
+                char * contentTypeP = strstr(buffer,"Content-Type:");
+                if (contentTypeP != NULL){
+                    int isJPEG = (strstr(contentTypeP,"jpeg") != NULL)||(strstr(contentTypeP,"jpg") != NULL);
+                    int isPNG = strstr(contentTypeP,"png") != NULL;
+                    if (isJPEG){
+                        strcat(fname, ".jpeg");
+                    }else if (isPNG){
+                        strcat(fname, ".png");
+                    }
+                }                             
+            }
             
-            if(fp != NULL){                
-                
-                fwrite(dataStart, 1, b-start, fp);
-                
-                printf("Received bytes: %d, header size %d\n",b, start);
-                
-                fclose(fp);                                
+            
+            char fullname [256] = "";  // Fullname = dir + filename
+            strcat(fullname, dir);
+            strcat(fullname, fname); 
+            
+            printf("Saving file in %s\n",fullname);
+
+            FILE* fp = fopen( fullname, "wb");                        
+            tot = 0;   //Total bytes of content counter                
+            
+            
+            if (headerSize != b){
+                if(fp != NULL  ){    
+                    
+                    fwrite(dataStart, 1, b-headerSize, fp);
+                    tot += (b-headerSize);                    
+                    
+                    while( tot < contentSize ){
+                        b = recv(new_socket, buffer, 1024,0) ;
+                        if (b < 1){
+                            printf("\nError reading contents!\n");break; // Handles disconnection from client                            
+                        }
+                        tot += b;
+                        fwrite(buffer, 1, b, fp);
+                        
+                    }
+                    
+                    printf("Received bytes: %ld, header size %ld, content size %ld\n",tot+headerSize, headerSize, contentSize);
+                    
+                    fclose(fp);                                
+                }else{
+                    perror("File\n");
+                } 
             }else{
-                perror("File\n");
-            }            
+                fclose(fp);   
+                printf("No Content Received!\n");
+            }
         }else if (strstr(buffer,"GET") != NULL){
             1;
         }
         
-        printf("buffer:\n%s",buffer);
+        
         
         write(new_socket , hello , strlen(hello));
         printf("------------------Hello message sent-------------------");
