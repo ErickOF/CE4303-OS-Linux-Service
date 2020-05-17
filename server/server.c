@@ -81,34 +81,37 @@ int main(int argc, char const *argv[])
         
         fwrite(buffer, 1, headerSize, stdout); // Prints the header of POST-GET
         
-        
-        if (strstr(buffer,"POST") != NULL){
-            
-            
-            char * contentSizeP = strstr(buffer,"Content-Length:");
-            contentSizeP += 15;
-            size_t contentSize =  strtol(contentSizeP, NULL, 10);
+        char * contentSizeP = strstr(buffer,"Content-Length:");
+        if ((strstr(buffer,"POST") != NULL) && (contentSizeP != NULL)){
+                                    
+            contentSizeP += 15; //Size of "Content-Length:"
+            size_t contentSize =  strtol(contentSizeP, NULL, 10); //Converts to size_t the size
                                                           
-            char dir [] = "./files/";                                    
-            char fname[50] = ""; 
+            char dir [] = "./files/"; // Dir to save                            
+            char fname[50] = ""; // Filename
             
-    
+            // If the header contains the name for the new file using the format:
+            // Filename: example.png
             char * filenameP = strstr(buffer,"Filename");
             if (filenameP != NULL){
-                char * filenamePE = strstr(filenameP,"\n");
-                filenameP += 10;
+                char * filenamePE = strstr(filenameP,"\n"); // Points to the end of this line
+                filenameP += 10; //Size of "Filename:"
                 int fNameLen = filenamePE - filenameP;
                 if (fNameLen > 1){
-                    memcpy(fname,filenameP,fNameLen);       
-                    printf("\ncurrent name is %s\n",fname);
+                    memcpy(fname,filenameP,fNameLen);      // Copies name to fname 
                 }else{
-                    filenameP = NULL;
+                    filenameP = NULL; //If the given name is too small it uses the time format name below
                 }
             } 
+            /* If the header doesn't contain the name of the file, the name will be taken 
+             * from the current time Y-m-d-H-M-S
+             * if the Content-Type header is included, appends the corresponding extension .jpg or .png
+             * Content-Type: *png*   OR   Content-Type: *jpeg*
+             */
             if(filenameP == NULL) {                
                 time_t rawtime;
                 time(&rawtime);
-                strftime(fname,49,"%Y-%m-%d-%H-%M-%S", localtime(&rawtime));
+                strftime(fname,49,"%Y-%m-%d-%H-%M-%S", localtime(&rawtime)); //Formats time
                 char * contentTypeP = strstr(buffer,"Content-Type:");
                 if (contentTypeP != NULL){
                     int isJPEG = (strstr(contentTypeP,"jpeg") != NULL)||(strstr(contentTypeP,"jpg") != NULL);
@@ -122,32 +125,33 @@ int main(int argc, char const *argv[])
             }
             
             
-            char fullname [256] = "";            
+            char fullname [256] = "";  // Fullname = dir + filename
             strcat(fullname, dir);
-            strcat(fullname, fname);
+            strcat(fullname, fname); 
             
-            printf("\nfullname is %s\n",fullname);
-                        
+            printf("Saving file in %s\n",fullname);
+
             FILE* fp = fopen( fullname, "wb");                        
-            tot = 0;                                    
+            tot = 0;   //Total bytes of content counter                
             
             
             if (headerSize != b){
                 if(fp != NULL  ){    
                     
                     fwrite(dataStart, 1, b-headerSize, fp);
-                    tot += (b-headerSize);
-                    
+                    tot += (b-headerSize);                    
                     
                     while( tot < contentSize ){
                         b = recv(new_socket, buffer, 1024,0) ;
-                        if (b < 1){printf("\nError reading contents!\n");break;}
+                        if (b < 1){
+                            printf("\nError reading contents!\n");break; // Handles disconnection from client                            
+                        }
                         tot += b;
                         fwrite(buffer, 1, b, fp);
                         
                     }
                     
-                    printf("Received bytes: %ld, header size %ld, contentSize %ld\n",tot+headerSize, headerSize, contentSize);
+                    printf("Received bytes: %ld, header size %ld, content size %ld\n",tot+headerSize, headerSize, contentSize);
                     
                     fclose(fp);                                
                 }else{
