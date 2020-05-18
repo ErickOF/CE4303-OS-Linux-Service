@@ -23,8 +23,14 @@ typedef struct ReqInfo{
 } ReqInfo;
 
 int newName(char buffer [1025], char fname [50], char fullname [256]);
-int writeFile(FILE* fp, char buffer[1025], ReqInfo postData);
+size_t writeFile(FILE* fp, char buffer[1025], ReqInfo postData);
 void handleConnections(int new_socket, int server_fd, int addrlen, struct sockaddr_in address);
+
+void getTimeName(char fname [50]){
+    time_t rawtime;
+    time(&rawtime);
+    strftime(fname,49,"%Y-%m-%d-%H-%M-%S", localtime(&rawtime)); //Formats time        
+}
 
 int main(){
     int port = 1717;
@@ -82,9 +88,7 @@ int newName(char buffer [1025], char fname [50], char fullname [256]){
     * Content-Type: *png*   OR   Content-Type: *jpeg*
     */
     if(filenameP == NULL) {                
-        time_t rawtime;
-        time(&rawtime);
-        strftime(fname,49,"%Y-%m-%d-%H-%M-%S", localtime(&rawtime)); //Formats time
+        getTimeName(fname);
         char * contentTypeP = strstr(buffer,"Content-Type:");
         if (contentTypeP != NULL){
             int isJPEG = (strstr(contentTypeP,"jpeg") != NULL)||(strstr(contentTypeP,"jpg") != NULL);
@@ -112,7 +116,7 @@ int newName(char buffer [1025], char fname [50], char fullname [256]){
     return 0;
 }
 
-int writeFile(FILE* fp, char buffer[1025], ReqInfo pData){
+size_t writeFile(FILE* fp, char buffer[1025], ReqInfo pData){
     size_t tot = 0;   //Total bytes of content counter                    
     if (pData.headerSize != pData.b){
         if(fp != NULL  ){                
@@ -135,14 +139,19 @@ int writeFile(FILE* fp, char buffer[1025], ReqInfo pData){
         fclose(fp);   
         printf("No Content Received!\n");
     }    
-    return 0;
+    return tot;
 }
 
 void handleConnections(int new_socket, int server_fd, int addrlen, struct sockaddr_in address  ){
     
     // Only this line has been changed. Everything is same.
     char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-    
+    char logFileName [256];
+    char timeName [50];
+    getTimeName(timeName);
+    strcpy(logFileName,dirLog); strcat(logFileName,timeName);strcat(logFileName,".log");
+    FILE* fpLog;
+
     while(1){
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
@@ -158,6 +167,11 @@ void handleConnections(int new_socket, int server_fd, int addrlen, struct sockad
         dataStart += 4;          
         size_t headerSize  = dataStart - buffer;        
         fwrite(buffer, 1, headerSize, stdout); // Prints the header of POST-GET - Later used for Logs        
+
+        fpLog = fopen(logFileName, "a+");
+        fwrite(buffer, 1, headerSize-2, fpLog);
+        fclose(fpLog);
+
         char * contentSizeP = strstr(buffer,"Content-Length:");
         
         ReqInfo postData = {.new_socket=new_socket, .b=b, .headerSize=headerSize, .contentSize=0, .dataStart=dataStart} ;
@@ -171,7 +185,13 @@ void handleConnections(int new_socket, int server_fd, int addrlen, struct sockad
             char fullname [256] = "";              
             newName(buffer, fname, fullname);
             FILE* fp = fopen( fullname, "wb");                                    
-            writeFile(fp,  buffer, postData);                        
+            size_t tot = writeFile(fp,  buffer, postData);
+
+            fpLog = fopen(logFileName, "a+");
+            fprintf(fpLog, "Received: %ld, Header size: %ld, Content size: %ld\n", tot+headerSize, headerSize, contentSize );
+            fprintf(fpLog, "Saved in: %s\n\n", fullname);
+            fclose(fpLog);
+
         }else if (strstr(buffer,"GET") != NULL){
             1;
         }                
