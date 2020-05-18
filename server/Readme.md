@@ -21,3 +21,7 @@ Para limpiar todas las carpetas y contenidos:
 ```
 make clean_all
 ```
+
+Archivo de configuración:
+* Si el puerto no se especifica, por defecto es el 1717.
+* Puede contener direcciones realtivas o absolutas para las carpetas.
