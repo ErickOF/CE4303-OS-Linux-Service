@@ -5,16 +5,14 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-
-// For timed names
 #include <time.h>
+#include "configHandler.h"
+
 /*
 Paginas usadas:
-
 https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa
-
 https://stackoverflow.com/questions/30440188/sending-files-from-client-to-server-using-sockets-in-c 
- */
+*/
 
 typedef struct ReqInfo{
   int new_socket;
@@ -24,58 +22,47 @@ typedef struct ReqInfo{
   char * dataStart;
 } ReqInfo;
 
-int newName(char buffer [1025], char fname [50], char dir [10], char fullname [256]);
-
+int newName(char buffer [1025], char fname [50], char fullname [256]);
 int writeFile(FILE* fp, char buffer[1025], ReqInfo postData);
-
 void handleConnections(int new_socket, int server_fd, int addrlen, struct sockaddr_in address);
 
-
-#define PORT 8081
-int main(int argc, char const *argv[])
-{
+int main(){
+    int port = 1717;
+    readConfig(&port);
+    createFolders();
+    
     int server_fd, new_socket; long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     
     // Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-    {
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0){
         perror("In socket");
         exit(EXIT_FAILURE);
-    }
-    
-
+    } 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     
-    // Temporal until config file is used
-    
-    int inpPort;
-    printf("Enter port: ");
-    scanf("%d", &inpPort);
-    address.sin_port = htons( inpPort );
-    //address.sin_port = htons( PORT );
-    
+    // Temporal until config file is used        
+    //printf("Enter port: ");
+    //scanf("%d", &port);
+    address.sin_port = htons( port );
+    //address.sin_port = htons( PORT );    
     memset(address.sin_zero, '\0', sizeof address.sin_zero);
         
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
-    {
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0){
         perror("In bind");
         exit(EXIT_FAILURE);
     }
-    if (listen(server_fd, 10) < 0)
-    {
+    if (listen(server_fd, 10) < 0){
         perror("In listen");
         exit(EXIT_FAILURE);
-    }
-    
-    handleConnections(new_socket, server_fd, addrlen, address );
-    
+    }    
+    handleConnections(new_socket, server_fd, addrlen, address );    
     return 0;
 }
 
-int newName(char buffer [1025], char fname [50], char dir [10], char fullname [256]){
+int newName(char buffer [1025], char fname [50], char fullname [256]){
     // If the header contains the name for the new file using the format:
     // Filename: example.png
     char * filenameP = strstr(buffer,"Filename");
@@ -90,10 +77,10 @@ int newName(char buffer [1025], char fname [50], char dir [10], char fullname [2
         }
     } 
     /* If the header doesn't contain the name of the file, the name will be taken 
-        * from the current time Y-m-d-H-M-S
-        * if the Content-Type header is included, appends the corresponding extension .jpg or .png
-        * Content-Type: *png*   OR   Content-Type: *jpeg*
-        */
+    * from the current time Y-m-d-H-M-S
+    * if the Content-Type header is included, appends the corresponding extension .jpg or .png
+    * Content-Type: *png*   OR   Content-Type: *jpeg*
+    */
     if(filenameP == NULL) {                
         time_t rawtime;
         time(&rawtime);
@@ -110,39 +97,36 @@ int newName(char buffer [1025], char fname [50], char dir [10], char fullname [2
         }                             
     }
     // Fullname = dir + filename
-    strcat(fullname, dir);
+    //strcat(fullname, dir);
+    srand(time(NULL));   // Initialization, should only be called once.
+    int r = rand()  % 3;            
+    if (r ==  0){
+        strcpy(fullname,dirCol); strcat(fullname,"/Blue/"); 
+    }else if (r ==  1){
+        strcpy(fullname,dirCol); strcat(fullname,"/Green/"); 
+    }else if (r ==  2){
+        strcpy(fullname,dirCol); strcat(fullname,"/Red/"); 
+    }           
     strcat(fullname, fname); 
-    printf("Saving file in %s\n",fullname);
-    
+    printf("Saving file in %s\n",fullname);    
     return 0;
-
 }
 
-
-
 int writeFile(FILE* fp, char buffer[1025], ReqInfo pData){
-                     
-    size_t tot = 0;   //Total bytes of content counter                
-    
-    
+    size_t tot = 0;   //Total bytes of content counter                    
     if (pData.headerSize != pData.b){
-        if(fp != NULL  ){    
-            
+        if(fp != NULL  ){                
             fwrite(pData.dataStart, 1, pData.b-pData.headerSize, fp);
-            tot += (pData.b-pData.headerSize);                    
-            
+            tot += (pData.b-pData.headerSize);                                
             while( tot < pData.contentSize ){
                 pData.b = recv(pData.new_socket, buffer, 1024,0) ;
                 if (pData.b < 1){
                     printf("\nError reading contents!\n");break; // Handles disconnection from client                            
                 }
                 tot += pData.b;
-                fwrite(buffer, 1, pData.b, fp);
-                
-            }
-            
-            printf("Received bytes: %ld, header size %ld, content size %ld\n",tot+pData.headerSize, pData.headerSize, pData.contentSize);
-            
+                fwrite(buffer, 1, pData.b, fp);            
+            }            
+            printf("Received bytes: %ld, header size %ld, content size %ld\n",tot+pData.headerSize, pData.headerSize, pData.contentSize);            
             fclose(fp);                                
         }else{
             perror("File\n");
@@ -159,8 +143,7 @@ void handleConnections(int new_socket, int server_fd, int addrlen, struct sockad
     // Only this line has been changed. Everything is same.
     char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
     
-    while(1)
-    {
+    while(1){
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
         {
@@ -183,14 +166,10 @@ void handleConnections(int new_socket, int server_fd, int addrlen, struct sockad
             contentSizeP += 15; //Size of "Content-Length:"
             size_t contentSize =  strtol(contentSizeP, NULL, 10); //Converts to size_t the size
             postData.contentSize=contentSize;
-            
-            char dir [10] = "./files/"; // Dir to save    
-            
-            int ff = mkdir(dir,0777);  // create folder
-            
+                        
             char fname[50] = ""; // Filename
             char fullname [256] = "";              
-            newName(buffer, fname, dir, fullname);
+            newName(buffer, fname, fullname);
             FILE* fp = fopen( fullname, "wb");                                    
             writeFile(fp,  buffer, postData);                        
         }else if (strstr(buffer,"GET") != NULL){
