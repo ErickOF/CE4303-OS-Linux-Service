@@ -7,6 +7,11 @@ APP=server
 CC=gcc
 CFLAGS=-o
 
+COLF=`cat config.conf | grep DirCol | cut -d':' -f 2`
+HISF=`cat config.conf | grep DirHis | cut -d':' -f 2`
+LOGF=`cat config.conf | grep DirLog | cut -d':' -f 2`
+
+
 clean:
 	@echo "Cleaning files..."
 	@rm -f *.out
@@ -16,10 +21,11 @@ clean:
 clean_all: 
 	@echo "Cleaning ALL files..."
 	@rm -f *.out
-	@rm -f *.o
-	@rm -rf logs/ 
-	@rm -rf cols
-	@rm -rf his/
+	@rm -f *.o	
+	@rm -f $(APP)
+	@rm -rf $(COLF)
+	@rm -rf $(HISF)
+	@rm -rf $(LOGF)
 
 server:
 	@echo "Creating program..."

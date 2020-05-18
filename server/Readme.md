@@ -10,3 +10,14 @@ Filename: imagen.jpeg
 Si no lleva el encabezado anterior, el nombre del archivo será la hora del sistema en el formato Y-m-d-H-M-S.
 Además intentará tomar la extensión del encabezado Content-Type si se encuentra disponible. Los formatos que busca de imágenes son:
 * jpeg, jpg, png
+
+
+Para compilar:
+```
+make
+```
+
+Para limpiar todas las carpetas y contenidos:
+```
+make clean_all
+```
