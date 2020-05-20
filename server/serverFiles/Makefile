@@ -29,5 +29,5 @@ clean_all:
 
 server:
 	@echo "Creating program..."
-	$(CC) $(CFILES) $(CFLAGS) $(APP)
+	$(CC) $(CFILES) $(CFLAGS) $(APP) -lm
 

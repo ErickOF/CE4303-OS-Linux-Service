@@ -3,8 +3,8 @@
 
 int main() {
 
-	char originalName [256] = "../imgs/RareLenna.png";
-	char filteredName[256] =  "../imgs/FilteredLenna2.png";
+	char originalName [256] = "./imgs/SnPNoisyLenna.png";
+	char filteredName[256] =  "./imgs/FilteredLenna2.png";
 
 
     int strongestColor = processImage(  originalName ,  filteredName );

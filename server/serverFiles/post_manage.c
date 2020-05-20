@@ -9,7 +9,7 @@
 #include "reqInfo.h"
 #include "configHandler.h"
 
-#include "include/ImageProcessing.h"
+#include "../include/ImageProcessing.h"
 
 void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char logFileName[256] ){
     FILE* fpLog;
@@ -29,7 +29,7 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
     fprintf(fpLog, "Saved in: %s\n\n", fullname);
 
     
-/*
+
     
 
     if (totWritten == contentSize){
@@ -37,7 +37,7 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
         strcpy(filteredName, dirHis);
         strcat(filteredName, fname);
         
-        int strongestColor = processImage( char fullname [256], char filteredName[256] );
+        int strongestColor = processImage( fullname , filteredName );
 
         char command[512] = "mv ";
         strcat(command,fullname);
@@ -48,16 +48,16 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
         if (strongestColor == 0){
             strcat(command,"/Red/");
         }else if (strongestColor == 1){
-            strcat(command,"/Blue/");
-        }else if (strongestColor == 2){
             strcat(command,"/Green/");
+        }else if (strongestColor == 2){
+            strcat(command,"/Blue/");
         }
         strcat(command,fname);
         system(command);
 
         
     }
-*/
+
     
     // Cerrar el archivo en temporal
 

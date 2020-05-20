@@ -1,0 +1,64 @@
+POST / HTTP/1.1
+Filename: FilteredLenna.png
+User-Agent: PostmanRuntime/7.24.1
+Accept: */*
+Postman-Token: 71eb9c35-544b-4410-afca-f6398185c598
+Host: 192.168.100.47:8081
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 96966
+Content-Type: image/png
+Received: 97250, Header size: 284, Content size: 96966
+Saved in: ./cols/FilteredLenna.png
+
+POST / HTTP/1.1
+Filename: Lenna.png
+User-Agent: PostmanRuntime/7.24.1
+Accept: */*
+Postman-Token: 2560e2c1-094b-4a53-a3f3-196e81c34c08
+Host: 192.168.100.47:8081
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 7358
+Content-Type: image/jpeg
+Received: 7634, Header size: 276, Content size: 7358
+Saved in: ./cols/Lenna.png
+
+POST / HTTP/1.1
+Filename: Lenna.png
+User-Agent: PostmanRuntime/7.24.1
+Accept: */*
+Postman-Token: e1063dbb-4f6a-4d8a-8abe-22db4d54424f
+Host: 192.168.100.47:8081
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 215
+Content-Type: image/png
+Received: 489, Header size: 274, Content size: 215
+Saved in: ./cols/Lenna.png
+
+POST / HTTP/1.1
+Filename: Lenna.png
+User-Agent: PostmanRuntime/7.24.1
+Accept: */*
+Postman-Token: d74bea58-63fa-42ac-9699-c110aa494fce
+Host: 192.168.100.47:8081
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 215
+Content-Type: image/png
+Received: 489, Header size: 274, Content size: 215
+Saved in: ./cols/Lenna.png
+
+POST / HTTP/1.1
+User-Agent: PostmanRuntime/7.24.1
+Accept: */*
+Postman-Token: 4679c209-4526-4fbf-97aa-02b5427be79b
+Host: 192.168.100.47:8081
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 215
+Content-Type: image/png
+Received: 468, Header size: 253, Content size: 215
+Saved in: ./cols/2020-05-20-16-57-27.png
+
