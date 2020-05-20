@@ -2,7 +2,7 @@
 .PHONY: all clean clean_all server
 all: clean server
 
-CFILES =  server.c configHandler.c
+CFILES =  server.c configHandler.c post_manage.c
 APP=server
 CC=gcc
 CFLAGS=-o
