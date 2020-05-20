@@ -102,15 +102,10 @@ int newName(char buffer [1025], char fname [50], char fullname [256]){
     }
     // Fullname = dir + filename
     //strcat(fullname, dir);
-    srand(time(NULL));   // Initialization, should only be called once.
-    int r = rand()  % 3;            
-    if (r ==  0){
-        strcpy(fullname,dirCol); strcat(fullname,"/Blue/"); 
-    }else if (r ==  1){
-        strcpy(fullname,dirCol); strcat(fullname,"/Green/"); 
-    }else if (r ==  2){
-        strcpy(fullname,dirCol); strcat(fullname,"/Red/"); 
-    }           
+    //srand(time(NULL));   // Initialization, should only be called once.
+
+     
+    strcpy(fullname,dirCol);       
     strcat(fullname, fname); 
     printf("Saving file in %s\n",fullname);    
     return 0;
@@ -125,7 +120,8 @@ size_t writeFile(FILE* fp, char buffer[1025], ReqInfo pData){
             while( tot < pData.contentSize ){
                 pData.b = recv(pData.new_socket, buffer, 1024,0) ;
                 if (pData.b < 1){
-                    printf("\nError reading contents!\n");break; // Handles disconnection from client                            
+                    printf("\nError reading contents!\n");
+                    break; // Handles disconnection from client                            
                 }
                 tot += pData.b;
                 fwrite(buffer, 1, pData.b, fp);            
@@ -188,8 +184,46 @@ void handleConnections(int new_socket, int server_fd, int addrlen, struct sockad
             size_t tot = writeFile(fp,  buffer, postData);
 
             fpLog = fopen(logFileName, "a+");
-            fprintf(fpLog, "Received: %ld, Header size: %ld, Content size: %ld\n", tot+headerSize, headerSize, contentSize );
+            fprintf(fpLog, "Received: %ld, Header size: %ld, Content size: %ld\n", tot+headerSize, headerSize, contentSize );            
             fprintf(fpLog, "Saved in: %s\n\n", fullname);
+
+            /*
+
+            char filteredName[256];
+            strcpy(filteredName, dirHis);
+            strcat(filteredName, fname);
+
+            if (tot = header + content){
+                int strongestColor = processImage( char fullname [256], char filteredName[256] );
+        
+                char command[512] = "mv ";
+                strcat(command,fullname);
+                strcat(command," ");
+
+                strcat(command,dirCol);
+
+                if (strongestColor == 0){
+                    strcat(command,"/Red/");
+                }else if (strongestColor == 1){
+                    strcat(command,"/Blue/");
+                }else if (strongestColor == 2){
+                    strcat(command,"/Green/");
+                }
+                strcat(command,fname);
+
+
+                system(command);
+
+                
+            }
+
+            */
+            // Cerrar el archivo en temporal
+
+
+            
+
+
             fclose(fpLog);
 
         }else if (strstr(buffer,"GET") != NULL){
