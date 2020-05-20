@@ -2,3 +2,7 @@
 server/files/
 
 *.out
+
+Procesamiento_imágenes/.idea/
+
+Procesamiento_imágenes/cmake-build-debug/
