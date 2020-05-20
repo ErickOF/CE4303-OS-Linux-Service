@@ -129,32 +129,36 @@ uint8_t get_strongest_channel(uint8_t* image){
 }
 
 
-int main() {
+int processImage( char originalName [256], char filteredName[256] ) {
 
     // Load the image
-    uint8_t* image = read_image("../imgs/SnPNoisyLenna.png", WIDTH, HEIGHT, CHANNELS, CHANNELS);
+    uint8_t* image = read_image( originalName, WIDTH, HEIGHT, CHANNELS, CHANNELS);
     // Define the kernel size
     uint8_t kernel_size = 3;
 
     // Start the convolution
     uint8_t* filtered_image = apply_filter(image, &median_filter, kernel_size);
 
-
     // Store the filtered image
-    write_image("../imgs/FilteredLenna.png", filtered_image);
+    write_image(filteredName, filtered_image);
+
+    int result = get_strongest_channel(image);
 
     // Free the memory of the images
     stbi_image_free(image);
     free(filtered_image);
+    return result;
+
+}
 
 
-    uint8_t* r = read_image("../imgs/r.png", WIDTH, HEIGHT, CHANNELS, CHANNELS);
-    uint8_t* g = read_image("../imgs/g.png", WIDTH, HEIGHT, CHANNELS, CHANNELS);
-    uint8_t* b = read_image("../imgs/b.png", WIDTH, HEIGHT, CHANNELS, CHANNELS);
-    printf("On image r the strongest channel is %d\n", get_strongest_channel((r)));
-    printf("On image g the strongest channel is %d\n", get_strongest_channel((g)));
-    printf("On image b the strongest channel is %d\n", get_strongest_channel((b)));
+int main() {
+
+	char originalName [256] = "../imgs/RareLenna.png";
+	char filteredName[256] =  "../imgs/FilteredLenna2.png";
 
 
+    int strongestColor = processImage(  originalName ,  filteredName );
+    printf("The strongest channel is %d\n", strongestColor );
 
 }
