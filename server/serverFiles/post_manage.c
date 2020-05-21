@@ -23,49 +23,49 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
     newName(buffer, fname, fullname);
     FILE* fp = fopen( fullname, "wb");                                    
     size_t totWritten = writeFile(fp,  buffer, reqData);
+    
+    int strongestColor = -1;
+    char filteredName[256];
 
     fpLog = fopen(logFileName, "a+");
     fprintf(fpLog, "Received: %ld, Header size: %ld, Content size: %ld\n", totWritten+reqData.headerSize, reqData.headerSize, contentSize );            
-    fprintf(fpLog, "Saved in: %s\n\n", fullname);
+    fprintf(fpLog, "Saved in: %s\n", fullname);
+    fclose(fpLog);  
 
-    
+    printf("Received: %ld, Header size: %ld, Content size: %ld\n", totWritten+reqData.headerSize, reqData.headerSize, contentSize );            
+    printf("Saved in: %s\n", fullname);
+       
 
-    
-
-    if (totWritten == contentSize){
-        char filteredName[256];
+    if (totWritten == contentSize){        
         strcpy(filteredName, dirHis);
-        strcat(filteredName, fname);
-        
-        int strongestColor = processImage( fullname , filteredName );
+        strcat(filteredName, fname);        
+        strongestColor = processImage( fullname , filteredName );
 
         char command[512] = "mv ";
         strcat(command,fullname);
         strcat(command," ");
-
-        strcat(command,dirCol);
-
+        strcpy(fullname,dirCol);
         if (strongestColor == 0){
-            strcat(command,"/Red/");
+            strcat(fullname,"/Red/");
         }else if (strongestColor == 1){
-            strcat(command,"/Green/");
+            strcat(fullname,"/Green/");
         }else if (strongestColor == 2){
-            strcat(command,"/Blue/");
+            strcat(fullname,"/Blue/");
         }
-        strcat(command,fname);
-        system(command);
-
-        
+        strcat(fullname,fname);
+        strcat(command,fullname);
+        system(command);    
     }
 
     
-    // Cerrar el archivo en temporal
-
-
-    
-
-
+    fpLog = fopen(logFileName, "a+");
+    fprintf(fpLog, "Filtered Image saved in: %s\n", filteredName );            
+    fprintf(fpLog, "Image moved to: %s\n\n", fullname);
     fclose(fpLog);  
+
+    printf("Filtered Image saved in: %s\n", filteredName );            
+    printf("Image moved to: %s\n\n", fullname);
+    
 }
 
 
@@ -117,7 +117,7 @@ int newName(char buffer [1025], char fname [50], char fullname [256]){
      
     strcpy(fullname,dirCol);       
     strcat(fullname, fname); 
-    printf("Saving file in %s\n",fullname);    
+    
     return 0;
 }
 
