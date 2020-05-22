@@ -30,74 +30,82 @@ int main(){
     int addrlen = sizeof(address);
     
     // Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0){
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("In socket");
         exit(EXIT_FAILURE);
     } 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     
-    // Temporal until config file is used        
+    // Temporal until config file is used
     //printf("Enter port: ");
     //scanf("%d", &port);
     address.sin_port = htons( port );
-    //address.sin_port = htons( PORT );    
+    //address.sin_port = htons( PORT );
     memset(address.sin_zero, '\0', sizeof address.sin_zero);
         
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0){
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0){
         perror("In bind");
         exit(EXIT_FAILURE);
     }
+
     if (listen(server_fd, 10) < 0){
         perror("In listen");
         exit(EXIT_FAILURE);
-    }    
-    handleConnections(new_socket, server_fd, addrlen, address );    
+    }
+
+    handleConnections(new_socket, server_fd, addrlen, address );
     return 0;
 }
 
 
-void handleConnections(int new_socket, int server_fd, int addrlen, struct sockaddr_in address  ){
+void handleConnections(int new_socket, int server_fd, int addrlen, struct sockaddr_in address) {
     
     // Only this line has been changed. Everything is same.
-    char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+    char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nAccess-Control-Allow-Origin: *\nContent-Length: 12\n\nHello world!";
     char logFileName [256];
     char timeName [50];
     getTimeName(timeName);
     strcpy(logFileName,dirLog); strcat(logFileName,timeName);strcat(logFileName,".log");
     FILE* fpLog;
 
-    while(1){
+    while(1) {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
         {
             perror("In accept");
             exit(EXIT_FAILURE);
         }
-        
-        char buffer[1025] = "";        
-        size_t  b;        
-        b = recv(new_socket, buffer, 1024,0) ;        
-        char * dataStart = strstr(buffer,"\r\n\r\n");
-        dataStart += 4;          
-        size_t headerSize  = dataStart - buffer;        
+
+        char buffer[1025] = "";
+        size_t  b;
+        b = recv(new_socket, buffer, 1024, 0);
+        char* dataStart = strstr(buffer, "\r\n\r\n");
+        dataStart += 4;
+        size_t headerSize = dataStart - buffer;
         fwrite(buffer, 1, headerSize, stdout); // Prints the header of POST-GET - Later used for Logs        
 
         fpLog = fopen(logFileName, "a+");
         fwrite(buffer, 1, headerSize-2, fpLog);
         fclose(fpLog);
 
-        char * contentSizeP = strstr(buffer,"Content-Length:");
+        char* contentSizeP = strstr(buffer, "Content-Length:");
         
-        ReqInfo reqData = {.new_socket=new_socket, .b=b, .headerSize=headerSize, .contentSize=0, .dataStart=dataStart} ;
-        
-        if ((strstr(buffer,"POST") != NULL) && (contentSizeP != NULL)){                                    
+        ReqInfo reqData = {.new_socket=new_socket, .b=b, .headerSize=headerSize, .contentSize=0, .dataStart=dataStart};
+
+        if ((strstr(buffer, "POST") != NULL) && (contentSizeP != NULL))
+        {
+            printf("------------------POST-------------------\n");
             post_manage(contentSizeP, buffer, reqData, logFileName );
-        }else if (strstr(buffer,"GET") != NULL){
-            1;
-        }                
-        
-        write(new_socket , hello , strlen(hello));
+        } else if (strstr(buffer,"GET") != NULL)
+        {
+            printf("-------------------GET-------------------\n");
+        } else
+        {
+            printf("------------------Fail--------------------\n");
+        }
+
+        write(new_socket, hello, strlen(hello));
         printf("------------------Hello message sent-------------------");
         close(new_socket);
     }

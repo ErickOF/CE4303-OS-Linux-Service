@@ -15,7 +15,6 @@
 
   <!-- Highlight Card -->
   <div class="card highlight-card card-small">
-
     <svg id="rocket" alt="Rocket Ship" xmlns="http://www.w3.org/2000/svg" width="101.678" height="101.678" viewBox="0 0 101.678 101.678">
       <g id="Group_83" data-name="Group 83" transform="translate(-141 -696)">
         <circle id="Ellipse_8" data-name="Ellipse 8" cx="50.839" cy="50.839" r="50.839" transform="translate(141 696)" fill="#dd0031"/>
@@ -35,24 +34,17 @@
   </div>
 
   <div class="card-container">
-    <p>
-      <input type="radio" value="Filter" name="gender" [(ngModel)]="type.name">Filter
-      <input type="radio" value="Classify" name="gender" [(ngModel)]="type.name">Classify
-   </p>
-  </div>
-
-  <div class="card-container">
     <input type="file" name="img" accept="image/*" (change)="onChange($event)">
   </div>
 
   <div class="card-container">
     <img *ngIf="loading" width="480" height="360" src="https://i.redd.it/6eqdnsnk9vwx.gif" alt="loading" />
-    <img [hidden]="loading" width="480" height="360" src="{{ source }}" />
+    <img [hidden]="loading" width="480" height="360" src="{{ img ? img.source : source }}" />
   </div>
 
   <div class="card-container">
-    <a class="card" target="_blank" rel="noopener">
-      {{ type.name }}
+    <a class="card" target="_blank" rel="noopener" (click)="onProcessImage()">
+      Process
 
       <svg class="material-icons" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
