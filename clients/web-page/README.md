@@ -1,6 +1,20 @@
 # WebPage
 
-Este proyecto fuer generado con [Angular CLI](https://github.com/angular/angular-cli) versión 8.3.25.
+Este proyecto fue generado con [Angular CLI](https://github.com/angular/angular-cli) versión 8.3.25.
+
+## Requerimientos
+Debe estar instalado NodeJS.
+
+## Instalación
+Para instalar Angular CLI:
+```
+npm i -g @angular/cli
+```
+
+Para instalar los módulos necesarios:
+```
+npm i
+```
 
 ## Servidor de desarrollo
 Ejecute
