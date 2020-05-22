@@ -1,5 +1,9 @@
+clients/app/e2e
+clients/app/node_modules
+clients/app/plataforms
+clients/app/resources
 clients/web-page/e2e
-clients/web-page/node-modules
+clients/web-page/node_modules
 
 server/files/
 

@@ -1,0 +1,17 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="secondary">
+    <ion-title>
+      Image Filter and Classifier
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-card>
+    <img width="100%" src="{{ img ? img.source : source }}"/>
+    <ion-card-content>
+      <ion-button expand="full" (click)="openGallery()">Upload image</ion-button>
+      <ion-button expand="full" (click)="onProcessImage()">Process</ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
