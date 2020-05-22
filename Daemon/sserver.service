@@ -1,0 +1,9 @@
+[Unit]
+Description=Server for image processing.
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/bin/server_service.sh
+
+[Install]
+WantedBy=multi-user.target
