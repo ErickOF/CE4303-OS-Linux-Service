@@ -137,7 +137,38 @@ uint8_t get_strongest_channel(uint8_t* image){
 }
 
 
-int processImage( char originalName [256], char filteredName[256] ) {
+int processImage( char originalName[256], char filteredName[256] ) {
+
+    // Check image dimensions
+    char avg_target[256], median_target[256];
+    char* ext = get_filename_ext(originalName);
+    int* dims;  //{width, height}
+
+    //If the extension starts with
+    if(strcmp(ext, "png") == 0){
+        dims = get_png_dim(originalName);
+    }
+    else if((strcmp(ext, "jpg") == 0) || (strcmp(ext, "jpeg") == 0)){
+        dims = get_jpg_dim(originalName);
+    }
+
+    // Update dims
+    WIDTH = *(dims);
+    HEIGHT = *(dims + 1);
+    free(dims);
+
+
+    // Get save path
+    const char *sliced_target = strrchr(filteredName, '/');
+    const char *name = strrchr(filteredName, '/') + 1;
+
+    memcpy(avg_target, filteredName, strlen(filteredName) - strlen(sliced_target));
+    memcpy(median_target, filteredName, strlen(filteredName) - strlen(sliced_target));
+    strcat(avg_target, "/avg_");
+    strcat(median_target, "/median_");
+    strcat(avg_target, name);
+    strcat(median_target, name);
+
 
     // Load the image
     uint8_t* image = read_image( originalName, WIDTH, HEIGHT, CHANNELS, CHANNELS);
@@ -145,16 +176,19 @@ int processImage( char originalName [256], char filteredName[256] ) {
     uint8_t kernel_size = 3;
 
     // Start the convolution
-    uint8_t* filtered_image = apply_filter(image, &median_filter, kernel_size);
+    uint8_t* median_image = apply_filter(image, &median_filter, kernel_size);
+    uint8_t* avg_image = apply_filter(image, &avg_filter, kernel_size);
 
     // Store the filtered image
-    write_image(filteredName, filtered_image);
+    write_image(median_target, median_image);
+    write_image(avg_target, avg_image);
 
     int result = get_strongest_channel(image);
 
     // Free the memory of the images
     stbi_image_free(image);
-    free(filtered_image);
+    free(avg_image);
+    free(median_image);
     return result;
 
 }

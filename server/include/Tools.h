@@ -5,6 +5,8 @@
 #ifndef T1_RAW_TOOLS_H
 #define T1_RAW_TOOLS_H
 
+#include <png.h>
+
 /*  Takes the current position of the center of the convolution filter and using the
     kernel size calculates the values inside the range of the filter
 
@@ -128,10 +130,83 @@ void merge_sort(uint8_t* array,int lower_limit, int upper_limit, size_t arr_len)
 }
 
 
+int* get_jpg_dim(const char* file){
+
+    int* dims = malloc(2*sizeof(int)); //{width, height}
+    int iPos, i;
+
+    // Open the file in binary mode
+    FILE *fp = fopen(file,"rb");
+    // Jump to the end of the file
+    fseek(fp,0,SEEK_END);
+    // Get the current byte offset in the file
+    long len = ftell(fp);
+    // Jump back to the beginning of the file
+    fseek(fp,0,SEEK_SET);
+
+    // Enough memory for the file
+    unsigned char *ucpImageBuffer = (unsigned char*) malloc (len+1);
+    // Read in the entire file
+    fread(ucpImageBuffer,1,len,fp);
+    // Close the file
+    fclose(fp);
+
+    /*Extract start of frame marker(FFCO) of width and hight and get the position*/
+    for(i=0;i<len;i++)
+    {
+        if((ucpImageBuffer[i]==0xFF) && (ucpImageBuffer[i+1]==0xC0) )
+        {
+            iPos=i;
+            break;
+        }
+    }
+
+    /*Moving to the particular byte position and assign byte value to pointer variable*/
+    iPos = iPos + 5;
+    *(dims + 1) = ucpImageBuffer[iPos]<<8|ucpImageBuffer[iPos+1];
+    *dims = ucpImageBuffer[iPos+2]<<8|ucpImageBuffer[iPos+3];
+
+    //printf("\nWxH = %dx%d\n\n", *dims, *(dims + 1));
+
+    free(ucpImageBuffer);
+
+    return dims;
+}
 
 
+int* get_png_dim(const char* file){
 
+    int* dims = malloc(2*sizeof(int)); //{width, height}
+    int iPos, i;
+    int bit_depth;
+    int color_type;
+    int interlace_method;
+    int compression_method;
+    int filter_method;
+    int j;
+    png_structp	png_ptr;
+    png_infop info_ptr;
 
+    // Open the file in binary mode
+    FILE *fp = fopen(file,"rb");
+    png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    info_ptr = png_create_info_struct (png_ptr);
+    png_init_io (png_ptr, fp);
+    png_read_png (png_ptr, info_ptr, 0, 0);
+    png_get_IHDR (png_ptr, info_ptr, dims, dims+1, & bit_depth,
+                  & color_type, & interlace_method, & compression_method,
+                  & filter_method);
+
+    //printf("\nWxH = %dx%d\n\n", *dims, *(dims + 1));
+
+    return dims;
+}
+
+const char *get_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
+}
 
 
 
