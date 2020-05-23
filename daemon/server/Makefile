@@ -30,4 +30,3 @@ clean_all:
 server:
 	@echo "Creating program..."
 	$(CC) $(CFILES) $(CFLAGS) $(APP) -lm -lpng
-	./${APP}
