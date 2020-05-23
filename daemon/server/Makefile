@@ -21,7 +21,7 @@ clean:
 clean_all: 
 	@echo "Cleaning ALL files..."
 	@rm -f *.out
-	@rm -f *.o	
+	@rm -f *.o
 	@rm -f $(APP)
 	@rm -rf $(COLF)
 	@rm -rf $(HISF)
@@ -30,4 +30,4 @@ clean_all:
 server:
 	@echo "Creating program..."
 	$(CC) $(CFILES) $(CFLAGS) $(APP) -lm -lpng
-
+	./${APP}
