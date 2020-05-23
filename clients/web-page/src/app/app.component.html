@@ -34,7 +34,10 @@
   </div>
 
   <div class="card-container">
-    <input type="file" name="img" accept="image/*" (change)="onChange($event)">
+    <label class="input-img" for="Upload"></label>
+  </div>
+  <div class="card-container">
+    <input id="Upload" type="file" name="img" accept="image/*" style="visibility: hidden" (change)="onChange($event)">
   </div>
 
   <div class="card-container">
