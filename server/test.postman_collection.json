@@ -1,0 +1,44 @@
+{
+	"info": {
+		"_postman_id": "a06a35cd-325f-4665-92c0-5ab7839a3ba5",
+		"name": "test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://192.168.100.47:8081/",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Filename",
+						"value": "Lenna.png",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"url": {
+					"raw": "http://192.168.100.47:8081/",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"100",
+						"47"
+					],
+					"port": "8081",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
