@@ -59,8 +59,8 @@ ionic cordova emulate ios
 
 Para emular un dispositivo móvil Android, ejecute
 ```
-ionic cordova build ios
-ionic cordova emulate ios
+ionic cordova build android
+ionic cordova emulate android
 ```
 
 ## Build
