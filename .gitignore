@@ -19,3 +19,9 @@ server/cols
 server/his
 server/logs
 .directory
+
+daemon/server/cols/
+daemon/server/his/
+daemon/server/logs/
+
+daemon/server/server

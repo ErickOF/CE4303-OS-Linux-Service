@@ -12,6 +12,13 @@ echo "ImageServer.service copy to /etc/systemd/system/ImageServer.service"
 sudo chmod 644 /etc/systemd/system/ImageServer.service
 echo "Permissions given to /etc/systemd/system/ImageServer.service"
 
+# Compilamos
+echo "Compiling code..."
+cd server
+make clean_all
+make
+cd ..
+
 # Copiamos el servidor a los archivos del sistema
 sudo cp -r ./server /etc/
 echo "server copy to /etc/"

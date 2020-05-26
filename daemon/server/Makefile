@@ -2,7 +2,7 @@
 .PHONY: all clean clean_all server
 all: clean server
 
-CFILES =  ./serverFiles/main.c ./serverFiles/configHandler.c ./serverFiles/post_manage.c
+CFILES =  ./serverFiles/main.c ./serverFiles/configHandler.c ./serverFiles/post_manage.c ./serverFiles/getImageSize.c
 APP=server
 CC=gcc
 CFLAGS=-o
@@ -21,7 +21,7 @@ clean:
 clean_all: 
 	@echo "Cleaning ALL files..."
 	@rm -f *.out
-	@rm -f *.o
+	@rm -f *.o	
 	@rm -f $(APP)
 	@rm -rf $(COLF)
 	@rm -rf $(HISF)
@@ -29,4 +29,5 @@ clean_all:
 
 server:
 	@echo "Creating program..."
-	$(CC) $(CFILES) $(CFLAGS) $(APP) -lm -lpng
+	$(CC) $(CFILES) $(CFLAGS) $(APP) -lm
+

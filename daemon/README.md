@@ -1,45 +1,54 @@
-# Azure (Opcional)
-Copiar los archivos al servidor de Azure:
-```
-scp /home/user/.../daemon user@publicip:.~/
-```
+# OS-Linux-Service
+Filter and Image Classifier as a Service
 
-Conéctese a Azure:
-```
-ssh -i pubkey user@publicip
-```
-Y entrar al folder `daemon`.
 
-# Configurar Demonio
-Ejecute el comando:
+
+
+## Install & uninstall service
+---
+
+* Install service
+
 ```
 ./setup_demon.sh
 ```
-asegúrese de que el archivo tenga permisos para ejecutarse. Sino ejecute:
+
+* Remove service files
+
 ```
-sudo chmode +x ./setup_demon.sh
+./delete_daemon.sh
 ```
 
-# Detener
+
+## Usage
+---
+
+*  Check Status
+
 ```
-sudo systemctl stop ImageServer
+sudo systemctl status ImageServer
 ```
 
-# Reiniciar
-```
-sudo systemctl restart ImageServer
-```
+* Start
 
-# Iniciar
 ```
 sudo systemctl start ImageServer
 ```
 
-# Eliminar el demonio
+* Stop
+
 ```
-./delete_demon.sh
+sudo systemctl stop ImageServer
 ```
-asegúrese de que el archivo tenga permisos para ejecutarse. Sino ejecute:
+
+* Stop
+
 ```
-sudo chmode +x ./delete_demon.sh
+sudo systemctl stop ImageServer
+```
+
+* Restart
+
+```
+sudo systemctl restart ImageServer
 ```

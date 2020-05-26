@@ -3,7 +3,10 @@ Description=Server for image processing.
 
 [Service]
 Type=simple
+Restart=always
+RestartSec=5
 ExecStart=/bin/bash /usr/bin/server_service.sh
+ExecStop= /bin/kill -2 $MAINPIDq
 
 [Install]
 WantedBy=multi-user.target
