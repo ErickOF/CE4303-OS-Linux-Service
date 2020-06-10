@@ -17,7 +17,7 @@
     kernel_size:    Side length of the kernel
 
 */
-uint8_t avg_filter(uint8_t* image, int* pos, uint8_t kernel_size){
+uint8_t avg_filter(uint8_t* image, size_t* pos, uint8_t kernel_size){
 
     // Array containing all the usefull positions in the range
     // size kernel_size*kernel_size
@@ -52,7 +52,7 @@ uint8_t avg_filter(uint8_t* image, int* pos, uint8_t kernel_size){
     kernel_size:    Side length of the kernel
 
 */
-uint8_t median_filter(uint8_t* image, int* pos, uint8_t kernel_size){
+uint8_t median_filter(uint8_t* image, size_t* pos, uint8_t kernel_size){
 
     // Array containing all the usefull positions in the range
     // size kernel_size*kernel_size

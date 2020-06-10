@@ -51,7 +51,7 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
 
         printf("Image size: %d, %d\n", WIDTH, HEIGHT);
 
-        strongestColor = processImage( fullname , filteredName );
+        strongestColor = processImage( fullname , filteredName, filters, kmedian, kavg );
 
         char command[512] = "mv ";
         strcat(command,fullname);

@@ -10,6 +10,8 @@
 char dirCol[256];
 char dirHis[256];
 char dirLog[256];
+int filters = 0;
+int kavg, kmedian;
 
 void readConfig(int* port){
     int c = 0;
@@ -32,6 +34,15 @@ void readConfig(int* port){
             ++c;
         }else if (c == 3 && ch == ':'){
             fscanf(fp, "%s", dirLog );
+            ++c;
+        }else if (c == 4 && ch == ':'){
+            fscanf(fp, "%d", &filters );
+            ++c;
+        }else if (c == 5 && ch == ':'){
+            fscanf(fp, "%d", &kavg );
+            ++c;
+        }else if (c == 6 && ch == ':'){
+            fscanf(fp, "%d", &kmedian );
             ++c;
         }else{
             continue;
