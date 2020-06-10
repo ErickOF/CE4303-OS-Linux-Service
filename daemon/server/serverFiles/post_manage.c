@@ -48,8 +48,8 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
         strcat(filteredName, fname);
 
         getImageSize(fullname, &WIDTH, &HEIGHT);
-
-        printf("Image size: %d, %d\n", WIDTH, HEIGHT);
+        
+        processMSG(logFileName);
 
         strongestColor = processImage( fullname , filteredName, filters, kmedian, kavg );
 
@@ -80,7 +80,44 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
     
 }
 
+void processMSG(char logFileName[256]){
+    FILE* fpLog = fopen(logFileName, "a+");
 
+
+    printf("Image size: %d, %d\n", WIDTH, HEIGHT);
+    fprintf(fpLog,"Image size: %d, %d\n", WIDTH, HEIGHT);
+
+    
+    if (filters == 1){
+        printf("Using median filter of window size %d\n",kmedian);
+        fprintf(fpLog, "Using median filter of window size %d\n",kmedian);
+        
+    }else if(filters == 2){
+        printf("Using average filter of window size %d\n",kavg);
+        fprintf(fpLog, "Using average filter of window size %d\n",kavg);
+ 
+     }else if(filters == 3){
+        printf("Using median filter of window size %d and then ",kmedian);
+        fprintf(fpLog, "Using median filter of window size %d and then",kmedian);
+        printf("using average filter of window size %d\n",kavg);
+        fprintf(fpLog, "using average filter of window size %d\n",kavg);
+        
+
+    }else if(filters == 4){    
+        printf("Using average filter of window size %d and then ",kavg);
+        fprintf(fpLog, "Using average filter of window size %d and then",kavg);
+        printf("using median filter of window size %d\n",kmedian);
+        fprintf(fpLog, "using median filter of window size %d\n",kmedian);
+
+    }else{
+        printf("Using median filter of window size %d\n",3);
+        fprintf(fpLog, "Using median filter of window size %d\n",3);
+
+    }
+
+    fclose(fpLog);  
+
+}
 
 void getTimeName(char fname [50]){
     time_t rawtime;

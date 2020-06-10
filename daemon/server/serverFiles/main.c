@@ -17,7 +17,7 @@ https://stackoverflow.com/questions/30440188/sending-files-from-client-to-server
 
 
 
-void handleConnections(int new_socket, int server_fd, int addrlen, struct sockaddr_in address);
+void handleConnections(int new_socket, int port, int server_fd, int addrlen, struct sockaddr_in address);
 
 
 int main(){
@@ -52,12 +52,12 @@ int main(){
         perror("In listen");
         exit(EXIT_FAILURE);
     }    
-    handleConnections(new_socket, server_fd, addrlen, address );    
+    handleConnections(new_socket, port, server_fd, addrlen, address );    
     return 0;
 }
 
 
-void handleConnections(int new_socket, int server_fd, int addrlen, struct sockaddr_in address  ){
+void handleConnections(int new_socket, int port, int server_fd, int addrlen, struct sockaddr_in address  ){
     
     // Only this line has been changed. Everything is same.
     char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nPost an image to this direction to filter and classify it!";
@@ -68,7 +68,7 @@ void handleConnections(int new_socket, int server_fd, int addrlen, struct sockad
     FILE* fpLog;
 
     while(1){
-        printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+        printf("\n+++++++ Waiting for new connection in port %d ++++++++\n\n",port);
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
         {
             perror("In accept");
