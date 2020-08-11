@@ -14,9 +14,9 @@
 #include "../include/ImageProcessing.h"
 #include "../include/constants.h"
 
-uint32_t WIDTH = 235;
-uint32_t HEIGHT = 215;
-uint32_t CHANNELS = 3;
+int WIDTH = 235;
+int HEIGHT = 215;
+int CHANNELS = 3;
 
 void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char logFileName[256] ){
     FILE* fpLog;
@@ -48,8 +48,11 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
 
 
     if (totWritten == contentSize){        
-        strcpy(filteredName, dirHis);
+        strcpy(filteredName, dirHis);        
         strcat(filteredName, fname);
+        int filteredExt = strlen(filteredName)-3;
+        char* pngext = "png";
+        memcpy(filteredName + filteredExt, pngext, 3);
 
         getImageSize(fullname, &WIDTH, &HEIGHT);
         
@@ -157,7 +160,7 @@ int newName(char buffer [1025], char fname [50], char fullname [256]){
             int isJPEG = (strstr(contentTypeP,"jpeg") != NULL)||(strstr(contentTypeP,"jpg") != NULL);
             int isPNG = strstr(contentTypeP,"png") != NULL;
             if (isJPEG){
-                strcat(fname, ".jpeg");
+                strcat(fname, ".jpg");
             }else if (isPNG){
                 strcat(fname, ".png");
             }

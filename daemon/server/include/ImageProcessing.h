@@ -1,6 +1,6 @@
 //
 // Created by erick on 20/5/20.
-//
+// Modified by Alexis on 8/20, free memory
 
 #ifndef T1_RAW_IMAGEPROCESSING_H
 #define T1_RAW_IMAGEPROCESSING_H
@@ -55,15 +55,16 @@ void write_image(char* filename, uint8_t* image){
     filter: Filter function to be applied
     kernel_size: Kernel size of the filter
 */
-uint8_t* apply_filter(  uint8_t* target,
-                        uint8_t (*filter)(uint8_t*, size_t*, uint8_t),// Changed from size_t to int
-                        uint8_t kernel_size){
+uint8_t *apply_filter(uint8_t *target,
+                      uint8_t (*filter)(uint8_t *, uint8_t *, size_t *, uint8_t), // Changed from size_t to int
+                      uint8_t kernel_size)
+{
 
     //Prepare variables needed for the convolution process
     size_t pos[2];
     uint8_t* filtered_image = (uint8_t*) malloc(WIDTH*HEIGHT*CHANNELS * sizeof(uint8_t));
 
-
+    uint8_t* values = malloc(kernel_size * kernel_size * sizeof(uint8_t));
     // Start the convolution
     // HEIGHT and WIDTH limits have to be multiplicated to take into account
     // the channels of the image
@@ -80,17 +81,15 @@ uint8_t* apply_filter(  uint8_t* target,
             {
                 pos[0] = w + c;
                 // Set the new value in the filtered image
-                *(filtered_image + h + w + c) = (*filter)(target, pos, kernel_size);
+                *(filtered_image + h + w + c) = (*filter)(values, target, pos, kernel_size);
 
             }
         }
     }
-
+    free(values);
     // Return result
     return filtered_image;
-
 }
-
 
 /*  Takes and RGB image and calculates the mean value of each channel, then
  *  selects the channel with the highest value and returns a value between 0-2
@@ -120,20 +119,22 @@ uint8_t get_strongest_channel(uint8_t* image){
             mean_rgb_values[2] += (float)*(image + h + w + 2) / (float)(HEIGHT*WIDTH);
         }
     }
-
-    // If the r channel is stronger or equal to the rest, select it
-    if((mean_rgb_values[0] >= mean_rgb_values[1]) && (mean_rgb_values[0] >= mean_rgb_values[2])){
-        return 0;
+    uint8_t result;
+        // If the r channel is stronger or equal to the rest, select it
+        if ((mean_rgb_values[0] >= mean_rgb_values[1]) && (mean_rgb_values[0] >= mean_rgb_values[2]))
+    {
+        result = 0;
     }
         // If the g channel is stronger or equal to the rest, select it
     else if(mean_rgb_values[1] >= mean_rgb_values[2]){
-        return 1;
+        result = 1;
     }
         // If the b channel is stronger or equal to the rest, select it
     else{
-        return 2;
+        result = 2;
     }
-
+    free(mean_rgb_values);
+    return result;
 }
 
 
