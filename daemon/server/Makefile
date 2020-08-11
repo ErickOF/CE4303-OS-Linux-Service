@@ -3,7 +3,7 @@
 all: clean server
 
 SRC = ./src
-CFILES =  $(SRC)/main.c $(SRC)/configHandler.c $(SRC)/post_manage.c $(SRC)/getImageSize.c
+CFILES =  $(SRC)/main.c $(SRC)/configHandler.c $(SRC)/post_manage.c 
 APP=server
 CC=gcc
 CFLAGS=-o

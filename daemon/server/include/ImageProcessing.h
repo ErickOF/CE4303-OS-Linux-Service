@@ -18,7 +18,7 @@
 #include "constants.h"
 #include "Filters.h"
 
-
+#define CHANNELS_DESIRED 3
 
 /*  Loads an image from memory
  *
@@ -29,16 +29,16 @@
  *  desired_channels:   Number of channels we want to load from the image
  *
  */
-uint8_t* read_image(char* filename, int width, int height, int channels, int desired_channels){
-
-
+uint8_t* read_image(char* filename, int* width, int* height, int* real_channels, int desired_channels){
+    
     // Read the image with a given w*h*c, last parameter is to ignore channels
-    uint8_t* image = stbi_load(filename, &width, &height, &channels, desired_channels);
+    uint8_t *image = stbi_load(filename, width, height, real_channels, desired_channels);
     if(image == NULL) {
         printf("Error in loading the image\n");
         exit(1);
     }
-
+    CHANNELS = desired_channels;
+    //printf("2nd scan size: %d %d %d\n", *width, *height, *real_channels);
     // Return the image
     return image;
 }
@@ -140,8 +140,9 @@ uint8_t get_strongest_channel(uint8_t* image){
 
 int processImage( char originalName [256], char filteredName[256], int filters, uint8_t kmedian, uint8_t kavg ) {
 
+    int real_channels;
     // Load the image
-    uint8_t* image = read_image( originalName, WIDTH, HEIGHT, CHANNELS, CHANNELS);
+    uint8_t *image = read_image(originalName, &WIDTH, &HEIGHT, &real_channels, CHANNELS_DESIRED);
     // Define the kernel size
     uint8_t kernel_size = 3;
 

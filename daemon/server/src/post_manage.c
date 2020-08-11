@@ -9,13 +9,12 @@
 #include "../include/post_manage.h"
 #include "../include/reqInfo.h"
 #include "../include/configHandler.h"
-#include "../include/getImageSize.h"
 
 #include "../include/ImageProcessing.h"
 #include "../include/constants.h"
 
-int WIDTH = 235;
-int HEIGHT = 215;
+int WIDTH;
+int HEIGHT;
 int CHANNELS = 3;
 
 void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char logFileName[256] ){
@@ -70,7 +69,7 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
         char* pngext = "png";
         memcpy(filteredName + filteredExt, pngext, 3);
 
-        getImageSize(fullname, &WIDTH, &HEIGHT);
+        //getImageSize(fullname, &WIDTH, &HEIGHT);
         
         processMSG(logFileName);
 
@@ -105,11 +104,6 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
 
 void processMSG(char logFileName[256]){
     FILE* fpLog = fopen(logFileName, "a+");
-
-
-    printf("Image size: %d, %d\n", WIDTH, HEIGHT);
-    fprintf(fpLog,"Image size: %d, %d\n", WIDTH, HEIGHT);
-
     
     if (filters == 1){
         printf("Using median filter of window size %d\n",kmedian);
