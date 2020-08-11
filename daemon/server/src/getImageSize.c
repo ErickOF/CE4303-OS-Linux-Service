@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "getImageSize.h"
+#include "../include/getImageSize.h"
 
 uint32_t reverse_bytes(uint32_t bytes)
 {

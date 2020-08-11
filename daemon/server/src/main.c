@@ -6,9 +6,9 @@
 #include <netinet/in.h>
 #include <string.h>
 
-#include "configHandler.h"
-#include "reqInfo.h"
-#include "post_manage.h"
+#include "../include/configHandler.h"
+#include "../include/reqInfo.h"
+#include "../include/post_manage.h"
 /*
 Paginas usadas:
 https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa

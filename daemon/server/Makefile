@@ -2,7 +2,8 @@
 .PHONY: all clean clean_all server
 all: clean server
 
-CFILES =  ./serverFiles/main.c ./serverFiles/configHandler.c ./serverFiles/post_manage.c ./serverFiles/getImageSize.c
+SRC = ./src
+CFILES =  $(SRC)/main.c $(SRC)/configHandler.c $(SRC)/post_manage.c $(SRC)/getImageSize.c
 APP=server
 CC=gcc
 CFLAGS=-o

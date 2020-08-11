@@ -5,11 +5,11 @@
 #include <time.h>
 #include <stdint.h>
 
-#include "configHandler.h"
-#include "post_manage.h"
-#include "reqInfo.h"
-#include "configHandler.h"
-#include "getImageSize.h"
+#include "../include/configHandler.h"
+#include "../include/post_manage.h"
+#include "../include/reqInfo.h"
+#include "../include/configHandler.h"
+#include "../include/getImageSize.h"
 
 #include "../include/ImageProcessing.h"
 #include "../include/constants.h"
@@ -23,6 +23,10 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
 
     contentSizeP += 15; //Size of "Content-Length:"
     size_t contentSize =  strtol(contentSizeP, NULL, 10); //Converts to size_t the size
+    if (contentSize == 0){
+        printf("Content size was 0\n");
+        return;
+    }
     reqData.contentSize=contentSize;
                 
     char fname[50] = ""; // Filename

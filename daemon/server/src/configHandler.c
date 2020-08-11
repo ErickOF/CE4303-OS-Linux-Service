@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "configHandler.h"
+#include "../include/configHandler.h"
 
 char dirCol[256];
 char dirHis[256];
