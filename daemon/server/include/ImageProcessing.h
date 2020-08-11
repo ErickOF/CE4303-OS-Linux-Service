@@ -1,6 +1,6 @@
 //
 // Created by erick on 20/5/20.
-//
+// Modified by Alexis on 8/20, free memory
 
 #ifndef T1_RAW_IMAGEPROCESSING_H
 #define T1_RAW_IMAGEPROCESSING_H
@@ -18,7 +18,7 @@
 #include "constants.h"
 #include "Filters.h"
 
-
+#define CHANNELS_DESIRED 3
 
 /*  Loads an image from memory
  *
@@ -29,16 +29,16 @@
  *  desired_channels:   Number of channels we want to load from the image
  *
  */
-uint8_t* read_image(char* filename, int width, int height, int channels, int desired_channels){
-
-
+uint8_t* read_image(char* filename, int* width, int* height, int* real_channels, int desired_channels){
+    
     // Read the image with a given w*h*c, last parameter is to ignore channels
-    uint8_t* image = stbi_load(filename, &width, &height, &channels, desired_channels);
+    uint8_t *image = stbi_load(filename, width, height, real_channels, desired_channels);
     if(image == NULL) {
         printf("Error in loading the image\n");
         exit(1);
     }
-
+    CHANNELS = desired_channels;
+    //printf("2nd scan size: %d %d %d\n", *width, *height, *real_channels);
     // Return the image
     return image;
 }
@@ -55,15 +55,16 @@ void write_image(char* filename, uint8_t* image){
     filter: Filter function to be applied
     kernel_size: Kernel size of the filter
 */
-uint8_t* apply_filter(  uint8_t* target,
-                        uint8_t (*filter)(uint8_t*, int*, uint8_t),// Changed from size_t to int
-                        uint8_t kernel_size){
+uint8_t *apply_filter(uint8_t *target,
+                      uint8_t (*filter)(uint8_t *, uint8_t *, size_t *, uint8_t), // Changed from size_t to int
+                      uint8_t kernel_size)
+{
 
     //Prepare variables needed for the convolution process
-    int pos[2];
+    size_t pos[2];
     uint8_t* filtered_image = (uint8_t*) malloc(WIDTH*HEIGHT*CHANNELS * sizeof(uint8_t));
 
-
+    uint8_t* values = malloc(kernel_size * kernel_size * sizeof(uint8_t));
     // Start the convolution
     // HEIGHT and WIDTH limits have to be multiplicated to take into account
     // the channels of the image
@@ -80,17 +81,15 @@ uint8_t* apply_filter(  uint8_t* target,
             {
                 pos[0] = w + c;
                 // Set the new value in the filtered image
-                *(filtered_image + h + w + c) = (*filter)(target, pos, kernel_size);
+                *(filtered_image + h + w + c) = (*filter)(values, target, pos, kernel_size);
 
             }
         }
     }
-
+    free(values);
     // Return result
     return filtered_image;
-
 }
-
 
 /*  Takes and RGB image and calculates the mean value of each channel, then
  *  selects the channel with the highest value and returns a value between 0-2
@@ -120,42 +119,71 @@ uint8_t get_strongest_channel(uint8_t* image){
             mean_rgb_values[2] += (float)*(image + h + w + 2) / (float)(HEIGHT*WIDTH);
         }
     }
-
-    // If the r channel is stronger or equal to the rest, select it
-    if((mean_rgb_values[0] >= mean_rgb_values[1]) && (mean_rgb_values[0] >= mean_rgb_values[2])){
-        return 0;
+    uint8_t result;
+        // If the r channel is stronger or equal to the rest, select it
+        if ((mean_rgb_values[0] >= mean_rgb_values[1]) && (mean_rgb_values[0] >= mean_rgb_values[2]))
+    {
+        result = 0;
     }
         // If the g channel is stronger or equal to the rest, select it
     else if(mean_rgb_values[1] >= mean_rgb_values[2]){
-        return 1;
+        result = 1;
     }
         // If the b channel is stronger or equal to the rest, select it
     else{
-        return 2;
+        result = 2;
     }
-
+    free(mean_rgb_values);
+    return result;
 }
 
 
-int processImage( char originalName [256], char filteredName[256] ) {
+int processImage( char originalName [256], char filteredName[256], int filters, uint8_t kmedian, uint8_t kavg ) {
 
+    int real_channels;
     // Load the image
-    uint8_t* image = read_image( originalName, WIDTH, HEIGHT, CHANNELS, CHANNELS);
+    uint8_t *image = read_image(originalName, &WIDTH, &HEIGHT, &real_channels, CHANNELS_DESIRED);
     // Define the kernel size
     uint8_t kernel_size = 3;
 
-    // Start the convolution
-    uint8_t* filtered_image = apply_filter(image, &median_filter, kernel_size);
+    int StrongestChannel = get_strongest_channel(image);
 
-    // Store the filtered image
+    uint8_t* filtered_image;
+
+    if (filters == 1){
+        filtered_image = apply_filter(image, &median_filter, kmedian);
+        stbi_image_free(image);
+
+    }else if(filters == 2){
+        filtered_image = apply_filter(image, &avg_filter, kavg);
+        stbi_image_free(image);
+
+    }else if(filters == 3){
+        filtered_image = apply_filter(image, &median_filter, kmedian);
+        stbi_image_free(image);
+        image = filtered_image;
+        filtered_image = apply_filter(image, &avg_filter, kavg);
+        free(image);
+
+    }else if(filters == 4){    
+        filtered_image = apply_filter(image, &avg_filter, kavg);
+        stbi_image_free(image);
+        image = filtered_image;
+        filtered_image = apply_filter(image, &median_filter, kmedian);
+        free(image);
+
+    }else{
+        // Start the convolution
+        filtered_image = apply_filter(image, &median_filter, kernel_size);
+        // Store the filtered image
+        stbi_image_free(image);
+    }
+
     write_image(filteredName, filtered_image);
-
-    int result = get_strongest_channel(image);
-
     // Free the memory of the images
-    stbi_image_free(image);
     free(filtered_image);
-    return result;
+    
+    return StrongestChannel;
 
 }
 

@@ -5,30 +5,42 @@
 #include <time.h>
 #include <stdint.h>
 
-#include "configHandler.h"
-#include "post_manage.h"
-#include "reqInfo.h"
-#include "configHandler.h"
-#include "getImageSize.h"
+#include "../include/configHandler.h"
+#include "../include/post_manage.h"
+#include "../include/reqInfo.h"
+#include "../include/configHandler.h"
 
 #include "../include/ImageProcessing.h"
 #include "../include/constants.h"
 
-uint32_t WIDTH = 235;
-uint32_t HEIGHT = 215;
-uint32_t CHANNELS = 3;
+int WIDTH;
+int HEIGHT;
+int CHANNELS = 3;
 
 void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char logFileName[256] ){
     FILE* fpLog;
 
     contentSizeP += 15; //Size of "Content-Length:"
     size_t contentSize =  strtol(contentSizeP, NULL, 10); //Converts to size_t the size
+    if (contentSize == 0){
+        printf("Content size was 0\n");
+        return;
+    }
     reqData.contentSize=contentSize;
                 
     char fname[50] = ""; // Filename
     char fullname [256] = "";              
     newName(buffer, fname, fullname);
-    FILE* fp = fopen( fullname, "wb");                                    
+
+    char * contentTypeP = strstr(buffer,"Content-Type:");
+    int isJPEG, isPNG;
+    if (contentTypeP != NULL){
+        isJPEG = (strstr(contentTypeP,"jpeg") != NULL)||(strstr(contentTypeP,"jpg") != NULL);
+        isPNG = strstr(contentTypeP,"png") != NULL;
+    }
+
+
+    FILE* fp = fopen( fullname, "wb");
     size_t totWritten = writeFile(fp,  buffer, reqData);
     
     int strongestColor = -1;
@@ -37,21 +49,31 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
     fpLog = fopen(logFileName, "a+");
     fprintf(fpLog, "Received: %ld, Header size: %ld, Content size: %ld\n", totWritten+reqData.headerSize, reqData.headerSize, contentSize );            
     fprintf(fpLog, "Saved in: %s\n", fullname);
-    fclose(fpLog);  
-
     printf("Received: %ld, Header size: %ld, Content size: %ld\n", totWritten+reqData.headerSize, reqData.headerSize, contentSize );            
     printf("Saved in: %s\n", fullname);
 
+  
+    if (!(isJPEG || isPNG)){
+        printf("File was not a PNG or JPG image\n");
+        fprintf(fpLog, "File was not a PNG or JPG image\n");
+        fclose(fpLog);
+        return;
+    }
+
+    fclose(fpLog);
 
     if (totWritten == contentSize){        
-        strcpy(filteredName, dirHis);
+        strcpy(filteredName, dirHis);        
         strcat(filteredName, fname);
+        int filteredExt = strlen(filteredName)-3;
+        char* pngext = "png";
+        memcpy(filteredName + filteredExt, pngext, 3);
 
-        getImageSize(fullname, &WIDTH, &HEIGHT);
+        //getImageSize(fullname, &WIDTH, &HEIGHT);
+        
+        processMSG(logFileName);
 
-        printf("Image size: %d, %d\n", WIDTH, HEIGHT);
-
-        strongestColor = processImage( fullname , filteredName );
+        strongestColor = processImage( fullname , filteredName, filters, kmedian, kavg );
 
         char command[512] = "mv ";
         strcat(command,fullname);
@@ -80,7 +102,39 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
     
 }
 
+void processMSG(char logFileName[256]){
+    FILE* fpLog = fopen(logFileName, "a+");
+    
+    if (filters == 1){
+        printf("Using median filter of window size %d\n",kmedian);
+        fprintf(fpLog, "Using median filter of window size %d\n",kmedian);
+        
+    }else if(filters == 2){
+        printf("Using average filter of window size %d\n",kavg);
+        fprintf(fpLog, "Using average filter of window size %d\n",kavg);
+ 
+     }else if(filters == 3){
+        printf("Using median filter of window size %d and then ",kmedian);
+        fprintf(fpLog, "Using median filter of window size %d and then",kmedian);
+        printf("using average filter of window size %d\n",kavg);
+        fprintf(fpLog, "using average filter of window size %d\n",kavg);
+        
 
+    }else if(filters == 4){    
+        printf("Using average filter of window size %d and then ",kavg);
+        fprintf(fpLog, "Using average filter of window size %d and then",kavg);
+        printf("using median filter of window size %d\n",kmedian);
+        fprintf(fpLog, "using median filter of window size %d\n",kmedian);
+
+    }else{
+        printf("Using median filter of window size %d\n",3);
+        fprintf(fpLog, "Using median filter of window size %d\n",3);
+
+    }
+
+    fclose(fpLog);  
+
+}
 
 void getTimeName(char fname [50]){
     time_t rawtime;
@@ -116,7 +170,7 @@ int newName(char buffer [1025], char fname [50], char fullname [256]){
             int isJPEG = (strstr(contentTypeP,"jpeg") != NULL)||(strstr(contentTypeP,"jpg") != NULL);
             int isPNG = strstr(contentTypeP,"png") != NULL;
             if (isJPEG){
-                strcat(fname, ".jpeg");
+                strcat(fname, ".jpg");
             }else if (isPNG){
                 strcat(fname, ".png");
             }

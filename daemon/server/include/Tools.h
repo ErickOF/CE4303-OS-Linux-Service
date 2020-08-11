@@ -5,6 +5,8 @@
 #ifndef T1_RAW_TOOLS_H
 #define T1_RAW_TOOLS_H
 
+#include <string.h>
+
 /*  Takes the current position of the center of the convolution filter and using the
     kernel size calculates the values inside the range of the filter
 
@@ -13,18 +15,19 @@
     kernel_size:    Size of the kernel used
 
 */
-uint8_t* get_values(uint8_t* image, int* current_pos, uint8_t kernel_size){
+uint8_t* get_values(uint8_t* values, uint8_t* image, size_t* current_pos, uint8_t kernel_size){
 
     // Calc the amount of steps to move in each direction
     // Multiply by the CHANNELS to take them into account when
     // moving through the image
     uint8_t half_kernel = (kernel_size / 2);
-    uint8_t* values = calloc(kernel_size*kernel_size, sizeof(uint8_t));
+    //uint8_t* values = calloc(kernel_size*kernel_size, sizeof(uint8_t));
+    
+    memset(values, 255, kernel_size * kernel_size);
     size_t v = 0;
 
-
     // Define the limits of the kernel
-    uint8_t  steps_back = half_kernel;
+    uint8_t steps_back = half_kernel;
     uint8_t steps_fwd = half_kernel;
     // If the kernel size if even
     if(kernel_size % 2 == 0){
@@ -32,11 +35,11 @@ uint8_t* get_values(uint8_t* image, int* current_pos, uint8_t kernel_size){
     }
 
     // Get the values
-    for (int h = current_pos[1] - steps_back*WIDTH*CHANNELS; h <= current_pos[1] + steps_fwd*WIDTH*CHANNELS; h += WIDTH*CHANNELS)
+    for (size_t h = current_pos[1] - steps_back*WIDTH*CHANNELS; h <= current_pos[1] + steps_fwd*WIDTH*CHANNELS; h += WIDTH*CHANNELS)
     {
         // If we are in a valid position search for the value
         if((h >= 0) && (h < HEIGHT*WIDTH*CHANNELS)){
-            for (int w = current_pos[0] - steps_back*CHANNELS; w <= current_pos[0] + steps_fwd*CHANNELS; w += CHANNELS)
+            for (size_t w = current_pos[0] - steps_back*CHANNELS; w <= current_pos[0] + steps_fwd*CHANNELS; w += CHANNELS)
             {
                 // If we are in a valid position search for the value
                 if((w >= 0) && (w < WIDTH*CHANNELS)){

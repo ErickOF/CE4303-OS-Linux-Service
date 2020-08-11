@@ -25,6 +25,10 @@ make clean_all
 * Puede contener direcciones realtivas o absolutas para las carpetas.
 * DirColores: Subcarpeta en donde se almacenan los archivos recibidos, contiene las subcarpetas Red Green Blue para clasificar la imagen.
 * DirHisto: Subcarpeta en donde se almacenan las imágenes filtradas.
+* Filters: Especifica el filtro a usar, 1 mediana, 2 media, 3 mediana y luego media, 4 media y luego mediana
+* AverageFilterSize: Tamaño de la ventana del filtro de media
+* MedianFilterSize: Tamaño de la ventana del filtro de mediana
+
 
 ### Uso:
 ---
@@ -35,7 +39,7 @@ El servidor recibe un mensaje POST que contiene el archivo a transferir.
 
 El nombre del nuevo archivo puede definirse por medio del encabezado, ejemplo:
 
-* Filename: imagen.jpeg
+* Filename: imagen.jpg
 
 
 Si no lleva el encabezado anterior, el nombre del archivo será la hora del sistema en el formato Y-m-d-H-M-S.
