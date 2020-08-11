@@ -32,7 +32,16 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
     char fname[50] = ""; // Filename
     char fullname [256] = "";              
     newName(buffer, fname, fullname);
-    FILE* fp = fopen( fullname, "wb");                                    
+
+    char * contentTypeP = strstr(buffer,"Content-Type:");
+    int isJPEG, isPNG;
+    if (contentTypeP != NULL){
+        isJPEG = (strstr(contentTypeP,"jpeg") != NULL)||(strstr(contentTypeP,"jpg") != NULL);
+        isPNG = strstr(contentTypeP,"png") != NULL;
+    }
+
+
+    FILE* fp = fopen( fullname, "wb");
     size_t totWritten = writeFile(fp,  buffer, reqData);
     
     int strongestColor = -1;
@@ -41,11 +50,18 @@ void post_manage(char * contentSizeP, char buffer[1025], ReqInfo reqData, char l
     fpLog = fopen(logFileName, "a+");
     fprintf(fpLog, "Received: %ld, Header size: %ld, Content size: %ld\n", totWritten+reqData.headerSize, reqData.headerSize, contentSize );            
     fprintf(fpLog, "Saved in: %s\n", fullname);
-    fclose(fpLog);  
-
     printf("Received: %ld, Header size: %ld, Content size: %ld\n", totWritten+reqData.headerSize, reqData.headerSize, contentSize );            
     printf("Saved in: %s\n", fullname);
 
+  
+    if (!(isJPEG || isPNG)){
+        printf("File was not a PNG or JPG image\n");
+        fprintf(fpLog, "File was not a PNG or JPG image\n");
+        fclose(fpLog);
+        return;
+    }
+
+    fclose(fpLog);
 
     if (totWritten == contentSize){        
         strcpy(filteredName, dirHis);        
