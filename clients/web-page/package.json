@@ -13,6 +13,9 @@
     "node": "25.2.1"
   },
   "private": true,
+  "overrides": {
+    "undici": "7.24.0"
+  },
   "dependencies": {
     "@angular/animations": "^21.0.0",
     "@angular/common": "^21.0.0",
