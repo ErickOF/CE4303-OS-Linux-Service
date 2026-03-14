@@ -3,7 +3,7 @@
 Este proyecto fue generado con [Ionic Framework 5](https://ionicframework.com/) versión 5.0.7.
 
 ## Requerimientos
-Debe estar instalado [NodeJS](https://nodejs.org/en/).
+Debe estar instalado [NodeJS 25.2.1](https://nodejs.org/en/).
 
 Si se desea una aplicación Android, el [SDK](https://developer.android.com/studio) debe ser instalado
 con las correspondientes versiones de Android deseadas.

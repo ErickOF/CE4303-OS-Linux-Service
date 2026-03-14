@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { Camera, CameraOptions } from '@awesome-cordova-plugins/camera/ngx';
 import { Image } from '../models/image';
 import { ImageManipulationService } from '../services/image-manipulation/image-manipulation.service';
 
 @Component({
   selector: 'app-home',
+  standalone: false,
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
