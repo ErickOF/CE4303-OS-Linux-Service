@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { SplashScreen } from '@awesome-cordova-plugins/splash-screen/ngx';
+import { StatusBar } from '@awesome-cordova-plugins/status-bar/ngx';
 
 @Component({
   selector: 'app-root',
+  standalone: false,
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
