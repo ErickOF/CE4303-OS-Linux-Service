@@ -16,6 +16,7 @@
   "overrides": {
     "glob": "file:./npm-overrides/karma-glob",
     "rimraf": "file:./npm-overrides/karma-rimraf",
+    "webpack-dev-server": "5.2.4",
     "sockjs": {
       "uuid": "14.0.0"
     }
