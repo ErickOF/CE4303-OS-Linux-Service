@@ -17,7 +17,7 @@
     "glob": "file:./npm-overrides/karma-glob",
     "rimraf": "file:./npm-overrides/karma-rimraf",
     "sockjs": {
-      "uuid": "11.1.0"
+      "uuid": "14.0.0"
     }
   },
   "dependencies": {
