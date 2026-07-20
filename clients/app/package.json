@@ -16,6 +16,7 @@
   },
   "private": true,
   "overrides": {
+    "esbuild": "0.28.1",
     "webpack-dev-server": "5.2.4",
     "sockjs": {
       "uuid": "14.0.0"
