@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { Camera, CameraOptions } from '@awesome-cordova-plugins/camera/ngx';
 import { Image } from '../models/image';
@@ -8,11 +8,12 @@ import { ImageManipulationService } from '../services/image-manipulation/image-m
   selector: 'app-home',
   standalone: false,
   templateUrl: 'home.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
   public source: string;
-  public img: Image;
+  public img?: Image;
   public images = [];
 
   constructor(
