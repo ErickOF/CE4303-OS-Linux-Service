@@ -1,20 +1,16 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
+    "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
     "useDefineForClassFields": false,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
     "lib": [
       "ES2022",
       "dom"

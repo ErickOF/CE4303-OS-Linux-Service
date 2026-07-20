@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ImageManipulationService } from './services/image-manipulation/image-manipulation.service';
 import { Image } from './models/image';
 import Swal from 'sweetalert2';
@@ -8,12 +8,13 @@ import Swal from 'sweetalert2';
   selector: 'app-root',
   standalone: false,
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  private fileReader;
+  private readonly fileReader = new FileReader();
   // Image to process
-  public img: Image
+  public img?: Image;
   public loading: boolean = false;
   // Image to show
   public source: string;
@@ -21,20 +22,25 @@ export class AppComponent {
   public title: string = 'Image Filter and Classifier';
 
   constructor(private imgManipulationService: ImageManipulationService) {
-    this.fileReader = new FileReader();
     this.source = 'https://pngimage.net/wp-content/uploads/2018/06/lena-png-3.png'
   }
 
   public onChange(event: Event): void {
-    let files = event.target['files'];
+    const files = (event.target as HTMLInputElement).files;
     this.loading = true;
 
-    if (files) {
+    if (files?.length) {
       this.fileReader.onload = () => {
+        const data = this.fileReader.result;
+        if (typeof data !== 'string') {
+          this.loading = false;
+          return;
+        }
+
         this.img = {
           name: 'Lena.png',
-          source: this.fileReader.result.toString(),
-          data: this.fileReader.result
+          source: data,
+          data
         }
         this.loading = false;
       };

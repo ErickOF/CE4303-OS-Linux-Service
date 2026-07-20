@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Config } from 'src/app/config/config';
+import { Config } from '../../config/config';
 import { Observable } from 'rxjs';
-import { Image } from 'src/app/models/image';
+import { Image } from '../../models/image';
 
 
 @Injectable({
@@ -12,7 +12,7 @@ export class ImageManipulationService {
 
   constructor(private http: HttpClient) { }
 
-  private _base64ToArrayBuffer(data) {
+  private _base64ToArrayBuffer(data: string): Blob {
     const base64Data = data.split(',')[1];
     const contentType = 'application/x-www-form-urlencoded';
     const sliceSize = 1024;
