@@ -16,6 +16,7 @@
   },
   "private": true,
   "overrides": {
+    "@hono/node-server": "^2.0.12",
     "esbuild": "0.28.1",
     "webpack-dev-server": "5.2.4",
     "sockjs": {
