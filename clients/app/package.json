@@ -29,7 +29,7 @@
     "@angular/core": "^22.1.0",
     "@angular/forms": "^22.1.0",
     "@angular/platform-browser": "^22.1.0",
-    "@angular/router": "^22.1.0",
+    "@angular/router": "^22.2.1",
     "@awesome-cordova-plugins/camera": "^9.2.0",
     "@awesome-cordova-plugins/core": "^9.2.0",
     "@awesome-cordova-plugins/splash-screen": "^9.2.0",
